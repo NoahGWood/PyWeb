@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="content">
+    <div class="card mx-auto w-75">
+        <div class="card-header text-center">
+            <h3 center>Welcome To PyWeb</h3>
+        </div>
+        <div class="card-body">
+            <h5 class="text-center">What is PyWeb?</h5>
+                <p>PyWeb is an OpenSource boilerplate generator and development tool for flask-based webapps.</p>
+                <p>You're using the "Blank" boilerplate, to change this page, open: {{ site['APP']['title'] }}/pages/home/templates/home.html and start editing!</p>
+            <h5 class="text-center">Why use PyWeb?</h5>
+            <ul>
+                <li>
+                    <p>PyWeb was designed to make python development <b>easy!</b></p>
+                </li>
+                <li>
+                    <p>PyWeb builds-in bootstrap to take your app development to the next level</p>
+                </li>
+            </ul>
+        </div>
+        <div class="card-footer">
+            <a href="rtfm.io/pyweb/getting_started">Need help getting started?</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

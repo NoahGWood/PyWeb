@@ -1,0 +1,39 @@
+To create a new page:
+
+create folders:
+	basic/
+		pages/
+			'new page'/
+				'static'/
+				'templates'/
+
+create blank html file in templates dir
+
+create routes.py
+	if blueprint
+		from flask import Blueprint, render_template
+		from flask import current_app as app
+		new_page_bp = Blueprint('new_page_bp', __name__,
+					template_folder='templates,
+					static_folder='static
+					)
+		@new_page_bp.route('new page')
+		def new_page():
+			return render_template('new page.html')
+
+	if not blueprint
+		from flask import render_template
+		from basic import app
+
+		@app.route('new page')
+		def new_page():
+			return render_template('new page.html')
+	
+
+append basic/pages/pages.ini:
+['new page']
+loc=ROOT/pages/'new page'
+routes=routes.py
+blueprint=True???
+bp=new_page_bp
+

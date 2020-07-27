@@ -1,0 +1,13 @@
+#!/usr/bin/python3
+import sys
+from cli_strings import label, usage, cmd_not_found
+from cli import CLI
+
+
+if len(sys.argv) == 1:
+    cmd_not_found()
+else:
+    args = sys.argv[1:]
+    x = CLI()
+    x.switch_cmd(args[0],*args[1:])
+    

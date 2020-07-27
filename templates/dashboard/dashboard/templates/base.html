@@ -1,0 +1,33 @@
+{# Get the header #}
+{% include "header.html" %}
+{% block extra_css %}{% endblock %}
+    <hr class="no-margins"/>
+    <div id="main-div" class="with-margins">
+    {# One-time system messages called Flash messages #}
+    {% block flash_messages %}
+        {%- with messages = get_flashed_messages(with_categories=true) -%}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category=='error' %}
+                        {% set category='danger' %}
+                    {% endif %}
+                    <div class="alert alert-{{category}}">{{ message|safe }}</d>
+                {% endfor %}
+            {% endif %}
+        {%- endwith -%}
+    {% endblock %}
+    <!-- Navbar -->
+    {% if site['NAVBAR']['enabled'] %}
+        {% include "navbar.html" %}
+    {% endif %}
+    <!-- Main Content -->
+    {% block main %}
+        {% block content %}{% endblock %}
+    {% endblock %}
+
+    <!-- Footer -->
+    {% include "footer.html" %}
+    <!-- Additional Javascript -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
