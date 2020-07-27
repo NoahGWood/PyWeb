@@ -109,7 +109,8 @@ START_HELP = """
            D,BOLD,R,GR,B,GR,B,GR,B,GR,B,GR,B,D)
 
 def err_not_proj(*args):
-    print("Sorry this isn't a project directory.")
+    print("Sorry {}{}{}{}{} needs to be run in a project directory.".format(
+        BOLD, B, args[0], B, R))
 
 def cmd_not_found(cmd=None,*args):
     if cmd:
@@ -118,3 +119,17 @@ def cmd_not_found(cmd=None,*args):
     print(label)
     print(usage)
 
+def help_switch(cmd):
+    switcher = {
+        'config':None,
+        'docs': None,
+        'start': START_HELP,
+        'serve': None,
+        'generate': None,
+        'g': None
+        }
+    x = switcher.get(cmd)
+    if x:
+        print(x)
+    else:
+        cmd_not_found(cmd)

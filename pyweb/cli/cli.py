@@ -1,15 +1,43 @@
 import configparser
-from cli_strings import cmd_not_found, err_not_proj, CONFIG_HELP
 import webbrowser
+import os
+from cli_strings import cmd_not_found, err_not_proj, CONFIG_HELP, help_switch
+
 
 def helper(func):
-    def help_wrapper(*args):
+    def help_wrapper(cmd, *args):
         if '--help' in args or '-h' in args:
-            cmd_not_found()
+            if '--help' in str(args[0]) or '-h' in str(args[0]):
+                help_switch(args[1])
+            else:
+                help_switch(args[0])
             exit()
-        func(*args)
+        func(cmd, *args)
     return help_wrapper
     
+
+def project_check(func):
+    """Check if we are in project directory"""
+    def check_wrapper(cmd, *args):
+        sfile = 'settings.conf'
+        found = False
+        i=0
+        while i <= 4:
+            if os.path.exists(sfile):
+                found = True
+                i = 5
+            else:
+                sfile = '../' + sfile
+                i += 1
+        if found == True:
+            with open(sfile) as f:
+                if '#PyWeb' in f.readline():
+                    func(*args)
+                else:
+                    err_not_proj(*args)
+        else:
+            err_not_proj(*args)
+    return check_wrapper
 
 class CLI:
     def __init__(self):
@@ -17,6 +45,7 @@ class CLI:
         self.docs_url = 'http://localhost'
         self.conf = configparser.ConfigParser()
 
+    @helper
     def switch_cmd(self, cmd, *args):
         switcher = {
             'config':self.config,
@@ -26,9 +55,10 @@ class CLI:
             'generate':self.generate,
             'g':self.generate
             }
-        return switcher.get(cmd, cmd_not_found)(*args)
-
-    def config(self, *args):
+        return switcher.get(cmd, cmd_not_found)(cmd, *args)
+    
+    @project_check
+    def config(self, cmd, *args):
         try:
             self.conf.read(self.conf_file)
             if args[0] == 'get':
@@ -44,12 +74,14 @@ class CLI:
         except Exception as e:
             print(CONFIG_HELP)
 
-    def config_set(self, *args):
+    @project_check
+    def config_set(self, cmd, *args):
         self.conf.set(*args)
         with open(self.conf_file, 'w') as f:
             self.conf.write(f)
 
-    def config_get(self):
+    @project_check
+    def config_get(self, cmd):
         try:
             self.conf.read(self.conf_file)
             for section in self.conf.sections():
@@ -59,34 +91,25 @@ class CLI:
         except Exception as e:
             err_not_proj('config')
             
-    @helper
-    def docs(self, *args):
+    def docs(self, cmd, *args):
         webbrowser.open_new_tab(self.docs_url)
         pass
 
-    @helper
-    def start(self, *args):
+    def start(self, cmd, *args):
         """Starts a new project"""
-        
+        from logic.start import START
+        START()
         pass
 
-    @helper
-    def serve(self, *args):
+    @project_check
+    def serve(self, cmd, *args):
+        print("Serving!")
         pass
 
-    @helper
-    def generate(self, *args):
+    @project_check
+    def generate(self, cmd, *args):
+        print("Generating!")
         pass
-
-    def __call__(self):
-        # Add code before function call
-        print('lol1')
-
-#        self.function()
-
-        print('lol3')
-        # Add code after function call
-        
 
 if __name__ in '__main__':
     cmd = 'config'
