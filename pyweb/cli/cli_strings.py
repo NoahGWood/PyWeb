@@ -49,10 +49,10 @@ CONFIG_HELP = """
     These commands are used to programmatically read, write, and delete CLI and
     project config values.
     
-    By default, these commands use your project's {}./ionic.config.json{} file.
+    By default, these commands use your project's {}./settings.conf{} file.
     
-    To use these commands for the global CLI config file ({}~/.ionic/config.json{}),
-    use the {}--global flag.{}
+    To use these commands for the global CLI config file ({}~/.pyweb/pyweb.conf{}),
+    use the {}--global flag.{} (not yet implemented)
 
 {}  Usage:{}
 
@@ -69,7 +69,7 @@ CONFIG_HELP = """
 INFO_HELP = """
 {}  PyWeb{}
 
-    PyWeb CLI                     :{} 0.0.1 (/usr/local/lib/node_modules/ionic){}
+    PyWeb CLI                     :{} 0.0.1-DEVEL {}
 """.format(BOLD,R,GR,D)
 
 START_HELP = """
@@ -108,9 +108,67 @@ START_HELP = """
            B,GR,D,B,D,B,D,B,GR,D,B,D,B,D,B,D,BOLD,R,B,D,B,GR,
            D,BOLD,R,GR,B,GR,B,GR,B,GR,B,GR,B,D)
 
-def err_not_proj(*args):
+GENERATE_HELP="""
+
+  {} {}pyweb generate{} - Automatically create framework features{}
+
+    This command uses the PyWeb CLI to generate features such as {}pages{}
+    and {}blueprints{}.
+
+  {}Usage:{}
+
+    {}$ {}pyweb generate <type> <name>{}
+
+  {}Inputs:{}
+
+    {}type{} ............................ {}The type of feature (e.g. {}page{}, {}blueprint{})
+    {}name{} ............................ {}The name/path of the feature being
+                                      generated
+
+  {}Examples:{}
+
+    {}$ pyweb generate 
+    $ pyweb generate page
+    $ pyweb generate page contact
+    $ pyweb generate blueprint
+    $ pyweb generate blueprint contact
+{}
+""".format(BOLD, B, D, R, B, D, B, D, BOLD, R, GR, B, D, BOLD, R, B, GR, D, B, D,
+        B, D, B, GR, D, BOLD, R, B, D)
+
+
+SERVE_HELP = """
+
+  {}{}pyweb serve{} - Start a local dev server for app dev/testing{}
+
+    Easily start a development server that launches in your server.    
+    By default, {}pyweb serve{} boots up a development server as specified  
+    in your app. {}pyweb serve{} uses Flask CLI and the equivalent flask cmd
+    is "flask run app.py".
+
+    {}pyweb serve{} should {}NOT{} be used for production.
+
+  {}Usage:{}
+
+    {}$ pyweb serve{}
+
+  {}Examples:{}
+
+    {}$ pyweb serve{}
+""".format(BOLD, B, D, R, B, D, B, D, B, D, BOLD, R, BOLD, R, B, D, BOLD, R, B, D)
+
+
+DOCS_HELP = """
+  {}{}pyweb docs{} - Open the PyWeb documentation website{}
+
+  {}Usage:{}
+
+    {}$ pyweb docs{}
+""".format(BOLD, B, D, R, BOLD, R, B, D)
+
+def err_not_proj():
     print("Sorry {}{}{}{}{} needs to be run in a project directory.".format(
-        BOLD, B, args[0], B, R))
+        BOLD, B, "PyWeb", D, R))
 
 def cmd_not_found(cmd=None,*args):
     if cmd:
@@ -121,12 +179,13 @@ def cmd_not_found(cmd=None,*args):
 
 def help_switch(cmd):
     switcher = {
-        'config':None,
-        'docs': None,
+        'config': CONFIG_HELP,
+        'docs': DOCS_HELP,
         'start': START_HELP,
-        'serve': None,
-        'generate': None,
-        'g': None
+        'serve': SERVE_HELP,
+        'generate': GENERATE_HELP,
+        'g': GENERATE_HELP,
+        'info': INFO_HELP
         }
     x = switcher.get(cmd)
     if x:

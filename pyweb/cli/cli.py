@@ -1,24 +1,38 @@
 import configparser
 import webbrowser
 import os
-from cli_strings import cmd_not_found, err_not_proj, CONFIG_HELP, help_switch
+from functools import wraps
+from cli.cli_strings import cmd_not_found, err_not_proj, CONFIG_HELP, INFO_HELP, help_switch
+from cli.logic import *
+
 
 
 def helper(func):
     def help_wrapper(cmd, *args):
         if '--help' in args or '-h' in args:
-            if '--help' in str(args[0]) or '-h' in str(args[0]):
-                help_switch(args[1])
+            if len(args) >= 2:
+                if '--help' in str(args[0]) or '-h' in str(args[0]):
+                    help_switch(args[1])
+                else:
+                    help_switch(args[0])
             else:
-                help_switch(args[0])
+                cmd_not_found()
             exit()
         func(cmd, *args)
     return help_wrapper
     
+def wrapper(method):
+    @wraps(method)
+    def _impl(self, *method_args, **method_kwargs):
+        method_output = method(self, 'cmd', *method_args, **method_kwargs)
+        return method_output + "!"
+    return _impl
 
-def project_check(func):
+
+def project_check(method):
     """Check if we are in project directory"""
-    def check_wrapper(cmd, *args):
+    @wraps(method)
+    def _impl(self, cmd, *args):
         sfile = 'settings.conf'
         found = False
         i=0
@@ -27,27 +41,30 @@ def project_check(func):
                 found = True
                 i = 5
             else:
-                sfile = '../' + sfile
+                sfile = os.path.join('..', sfile)
                 i += 1
         if found == True:
             with open(sfile) as f:
                 if '#PyWeb' in f.readline():
-                    func(*args)
+                    sfile = os.path.join(os.getcwd(), sfile).strip('settings.conf')
+                    return method(self, sfile, cmd, *args)
                 else:
-                    err_not_proj(*args)
+                    return err_not_proj()
         else:
-            err_not_proj(*args)
-    return check_wrapper
+            return err_not_proj()
+    return _impl
 
 class CLI:
     def __init__(self):
-        self.conf_file = 'pyweb.conf'
+
+        self.conf_file = 'settings.conf'
         self.docs_url = 'http://localhost'
         self.conf = configparser.ConfigParser()
 
     @helper
     def switch_cmd(self, cmd, *args):
         switcher = {
+            'info': self.info,
             'config':self.config,
             'docs':self.docs,
             'start':self.start,
@@ -56,9 +73,12 @@ class CLI:
             'g':self.generate
             }
         return switcher.get(cmd, cmd_not_found)(cmd, *args)
+
+    def info(self, cmd, *args):
+        print(INFO_HELP)
     
     @project_check
-    def config(self, cmd, *args):
+    def config(self, sfile, cmd, *args):
         try:
             self.conf.read(self.conf_file)
             if args[0] == 'get':
@@ -75,13 +95,13 @@ class CLI:
             print(CONFIG_HELP)
 
     @project_check
-    def config_set(self, cmd, *args):
+    def config_set(self, sfile, cmd, *args):
         self.conf.set(*args)
         with open(self.conf_file, 'w') as f:
             self.conf.write(f)
 
     @project_check
-    def config_get(self, cmd):
+    def config_get(self, sfile, cmd):
         try:
             self.conf.read(self.conf_file)
             for section in self.conf.sections():
@@ -97,17 +117,17 @@ class CLI:
 
     def start(self, cmd, *args):
         """Starts a new project"""
-        from logic.start import START
         START()
         pass
 
     @project_check
-    def serve(self, cmd, *args):
-        print("Serving!")
+    def serve(self, sfile, cmd, *args):
+        os.chdir(sfile)
+        SERVE('app.py')
         pass
 
     @project_check
-    def generate(self, cmd, *args):
+    def generate(self, sfile, cmd, *args):
         print("Generating!")
         pass
 

@@ -23,5 +23,10 @@ questions = [
 ]
 
 
-answers = prompt(questions, answers=['bob','Blank        | A blank starter project'])
-print(answers)
+#answers = prompt(questions, answers=['bob','Blank        | A blank starter project'])
+#print(answers)
+
+
+def GENERATE(*args):
+    print(args)
+    pass

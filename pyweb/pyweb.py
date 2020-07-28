@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import sys
-from cli_strings import label, usage, cmd_not_found
-from cli import CLI
+from cli.cli_strings import label, usage, cmd_not_found
+from cli.cli import CLI
 
 
 if len(sys.argv) == 1:
